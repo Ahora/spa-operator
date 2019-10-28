@@ -216,6 +216,27 @@ func newIngress(cr *ahorav1alpha1.SPA) *v1beta1.Ingress {
 	labels := map[string]string{
 		"app": cr.Name,
 	}
+
+	var rules []v1beta1.IngressRule
+	for _, host := range cr.Spec.Hosts {
+		rule := v1beta1.IngressRule{
+			Host: host,
+			IngressRuleValue: v1beta1.IngressRuleValue{
+				HTTP: &v1beta1.HTTPIngressRuleValue{
+					Paths: []v1beta1.HTTPIngressPath{
+						{
+							Backend: v1beta1.IngressBackend{
+								ServiceName: cr.Name,
+								ServicePort: intstr.FromInt(80),
+							},
+						},
+					},
+				},
+			},
+		}
+		rules = append(rules, rule)
+	}
+
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        cr.Name,
@@ -224,23 +245,8 @@ func newIngress(cr *ahorav1alpha1.SPA) *v1beta1.Ingress {
 			Annotations: cr.Annotations,
 		},
 		Spec: v1beta1.IngressSpec{
-			Rules: []v1beta1.IngressRule{
-				{
-					Host: cr.Spec.Host,
-					IngressRuleValue: v1beta1.IngressRuleValue{
-						HTTP: &v1beta1.HTTPIngressRuleValue{
-							Paths: []v1beta1.HTTPIngressPath{
-								{
-									Backend: v1beta1.IngressBackend{
-										ServiceName: cr.Name,
-										ServicePort: intstr.FromInt(80),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			TLS:   cr.Spec.TLS,
+			Rules: rules,
 		},
 	}
 }

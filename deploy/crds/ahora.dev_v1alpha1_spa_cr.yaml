@@ -5,4 +5,5 @@ metadata:
 spec:
   SPAArchiveURL: https://storage.googleapis.com/ahora-spa-archives/spa-demo.tar.gz
   replicas: 1
-  host: demo.ahora.com
+  hosts: 
+  - demo.ahora.com

@@ -24,14 +24,22 @@ apiVersion: ahora.dev/v1alpha1
 kind: SPA
 metadata:
   name: example-spa
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   SPAArchiveURL: https://storage.googleapis.com/ahora-spa-archives/spa-demo.tar.gz
-  replicas: 2
-  host: www.yourdomain.com
+  replicas: 1
+  hosts: 
+  - www.example.com
+  - example.com
+  tls:
+  - secretName: ahora-ssl
+    hosts:
+    - www.example.com
+    - example.com
 ```
 
 ## TODOs
-* Support SSL.
 * Support custom backend for API service (/api)
 * Patch service, ingress & Deployment if needed
 * Writing tests
