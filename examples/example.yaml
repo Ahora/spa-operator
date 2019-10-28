@@ -33,4 +33,9 @@ spec:
       cpu: "50m"
     limits:
       memory: "64Mi"
-      cpu: "100m"Z
+      cpu: "100m"
+  paths:
+  - path: /api
+    backend:
+      serviceName: backendservice
+      servicePort: 80

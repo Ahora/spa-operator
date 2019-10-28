@@ -56,6 +56,11 @@ spec:
     limits:
       memory: "64Mi"
       cpu: "100m"
+  paths:
+  - path: /api
+    backend:
+      serviceName: backendservice
+      servicePort: 80
 ```
 
 ## TODOs
