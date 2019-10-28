@@ -64,5 +64,4 @@ spec:
 ```
 
 ## TODOs
-* Support custom backend for API service (/api)
 * Writing tests
