@@ -1,6 +1,8 @@
 # Ahora SPA Operator
-## Introduction
-An operator which manage [SPA](https://github.com/ahora/spa) crd in kubrenetes.
+## Introduction 
+Manage [SPA](https://github.com/ahora/spa) deployment with crds in kubernetes.
+
+**You are more than welcome to contribute to this project.**
 
 ## Usage
 ``` sh
