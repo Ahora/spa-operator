@@ -25,7 +25,7 @@ kind: SPA
 metadata:
   name: example-spa
 spec:
-  SPAArchiveURL: https://ahora.dev/archive.tar.gz
+  SPAArchiveURL: https://storage.googleapis.com/ahora-spa-archives/spa-demo.tar.gz
   replicas: 2
   host: www.yourdomain.com
 ```
