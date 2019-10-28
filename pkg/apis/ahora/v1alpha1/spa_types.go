@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -11,10 +12,14 @@ import (
 // SPASpec defines the desired state of SPA
 // +k8s:openapi-gen=true
 type SPASpec struct {
-	Replicas      *int32               `json:"replicas"`
-	SPAArchiveURL string               `json:"SPAArchiveURL"`
-	TLS           []v1beta1.IngressTLS `json:"tls"`
-	Hosts         []string             `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
+	Replicas       *int32                      `json:"replicas"`
+	SPAArchiveURL  string                      `json:"SPAArchiveURL"`
+	Hosts          []string                    `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
+	TLS            []v1beta1.IngressTLS        `json:"tls"`
+	Paths          []v1beta1.HTTPIngressPath   `json:"paths" protobuf:"bytes,1,rep,name=paths"`
+	Resources      corev1.ResourceRequirements `json:"resources,omitempty" protobuf:"bytes,8,opt,name=resources"`
+	LivenessProbe  *corev1.Probe               `json:"livenessProbe,omitempty" protobuf:"bytes,10,opt,name=livenessProbe"`
+	ReadinessProbe *corev1.Probe               `json:"readinessProbe,omitempty" protobuf:"bytes,11,opt,name=readinessProbe"`
 }
 
 // SPAStatus defines the observed state of SPA

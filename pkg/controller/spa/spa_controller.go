@@ -173,8 +173,11 @@ func newDeploymentForCR(cr *ahorav1alpha1.SPA) *appsv1.Deployment {
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "spa",
-							Image: "ahora/spa:0.0.1",
+							Resources:      cr.Spec.Resources,
+							ReadinessProbe: cr.Spec.ReadinessProbe,
+							LivenessProbe:  cr.Spec.LivenessProbe,
+							Name:           "spa",
+							Image:          "ahora/spa:0.0.1",
 							Env: []corev1.EnvVar{
 								{
 									Name:  "SPAARCHIVEURL",
@@ -217,20 +220,28 @@ func newIngress(cr *ahorav1alpha1.SPA) *v1beta1.Ingress {
 		"app": cr.Name,
 	}
 
+	//create paths for all paths from CR.
+	paths := []v1beta1.HTTPIngressPath{
+		{
+			Backend: v1beta1.IngressBackend{
+				ServiceName: cr.Name,
+				ServicePort: intstr.FromInt(80),
+			},
+		},
+	}
+
+	for _, path := range cr.Spec.Paths {
+		paths = append(paths, path)
+	}
+
+	//Create rules for all gosts
 	var rules []v1beta1.IngressRule
 	for _, host := range cr.Spec.Hosts {
 		rule := v1beta1.IngressRule{
 			Host: host,
 			IngressRuleValue: v1beta1.IngressRuleValue{
 				HTTP: &v1beta1.HTTPIngressRuleValue{
-					Paths: []v1beta1.HTTPIngressPath{
-						{
-							Backend: v1beta1.IngressBackend{
-								ServiceName: cr.Name,
-								ServicePort: intstr.FromInt(80),
-							},
-						},
-					},
+					Paths: paths,
 				},
 			},
 		}
