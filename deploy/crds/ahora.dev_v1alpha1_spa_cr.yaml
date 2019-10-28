@@ -1,0 +1,8 @@
+apiVersion: ahora.dev/v1alpha1
+kind: SPA
+metadata:
+  name: example-spa
+spec:
+  SPAArchiveURL: https://ahora.dev/archive.tar.gz
+  replicas: 1
+  host: local.ahora.com

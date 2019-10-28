@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spa-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: spa-operator
+  template:
+    metadata:
+      labels:
+        name: spa-operator
+    spec:
+      serviceAccountName: spa-operator
+      containers:
+        - name: spa-operator
+          # Replace this with the built image name
+          image: ahora/spa-operator:0.0.4
+          command:
+          - spa-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "spa-operator"
