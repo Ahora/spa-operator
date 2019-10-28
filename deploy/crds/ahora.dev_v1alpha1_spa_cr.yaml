@@ -1,9 +1,0 @@
-apiVersion: ahora.dev/v1alpha1
-kind: SPA
-metadata:
-  name: example-spa
-spec:
-  SPAArchiveURL: https://storage.googleapis.com/ahora-spa-archives/spa-demo.tar.gz
-  replicas: 1
-  hosts: 
-  - demo.ahora.com

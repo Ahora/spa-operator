@@ -16,7 +16,7 @@ spec:
       containers:
         - name: spa-operator
           # Replace this with the built image name
-          image: ahora/spa-operator:0.0.3
+          image: ahora/spa-operator:latest
           command:
           - spa-operator
           imagePullPolicy: Always
