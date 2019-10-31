@@ -145,7 +145,7 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 			if err != nil {
 				return reconcile.Result{}, err
 			} else {
-				reqLogger.Info("Updated a new Deployment", "Deployment.Namespace", newDeploymentInstance.Namespace, "deployment.Name", newDeploymentInstance.Name)
+				reqLogger.Info("Updated Deployment", "Namespace", newDeploymentInstance.Namespace, "Name", newDeploymentInstance.Name)
 			}
 		}
 	}
@@ -161,6 +161,18 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 		}
 	} else if err != nil {
 		return reconcile.Result{}, err
+	} else {
+
+		if !reflect.DeepEqual(newIngressInstance.Spec, foundIngress.Spec) {
+			ctx := context.TODO()
+			err := r.client.Update(ctx, newIngressInstance)
+
+			if err != nil {
+				return reconcile.Result{}, err
+			} else {
+				reqLogger.Info("Updated Ingress", "Namespace", newIngressInstance.Namespace, "Name", newIngressInstance.Name)
+			}
+		}
 	}
 
 	// Check if this Service already exists
@@ -177,6 +189,18 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 		return reconcile.Result{}, nil
 	} else if err != nil {
 		return reconcile.Result{}, err
+	} else {
+
+		if !reflect.DeepEqual(newServiceInstance.Spec, foundService.Spec) {
+			ctx := context.TODO()
+			err := r.client.Update(ctx, newServiceInstance)
+
+			if err != nil {
+				return reconcile.Result{}, err
+			} else {
+				reqLogger.Info("Updated Service", "Namespace", newServiceInstance.Namespace, "Name", newServiceInstance.Name)
+			}
+		}
 	}
 
 	return reconcile.Result{}, nil

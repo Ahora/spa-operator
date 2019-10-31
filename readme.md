@@ -66,5 +66,4 @@ spec:
 ```
 
 ## TODOs
-* Handle crd patches & deletion.
 * Writing tests
