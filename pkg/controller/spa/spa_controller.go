@@ -2,11 +2,12 @@ package spa
 
 import (
 	"context"
+	"reflect"
 
-	ahorav1alpha1 "github.com/example-inc/app-operator/pkg/apis/ahora/v1alpha1"
+	ahorav1alpha1 "github.com/ahora/spa-operator/pkg/apis/ahora/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1beta1 "k8s.io/api/extensions/v1beta1"
+	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,10 +55,14 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &ahorav1alpha1.SPA{},
-	})
+	/*
+		// TODO(user): Modify this to be the types you create that are owned by the primary resource
+		// Watch for changes to secondary resource Pods and requeue the owner SPA
+		err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
+			IsController: true,
+			OwnerType:    &ahorav1alpha1.SPA{},
+		})
+	*/
 	if err != nil {
 		return err
 	}
@@ -75,6 +80,14 @@ type ReconcileSPA struct {
 	client client.Client
 	scheme *runtime.Scheme
 }
+
+// Reconcile reads that state of the cluster for a SPA object and makes changes based on the state read
+// and what is in the SPA.Spec
+// TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
+// a Pod as an example
+// Note:
+// The Controller will requeue the Request to be processed again if the returned error is non-nil or
+// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 
 func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
@@ -95,42 +108,54 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 	}
 
 	// Define a new Deployment object
-	deployment := newDeploymentForCR(instance)
-	service := newServiceForCR(instance)
-	ingress := newIngress(instance)
+	newDeploymentInstance := newDeploymentForCR(instance)
+	newServiceInstance := newServiceForCR(instance)
+	newIngressInstance := newIngress(instance)
 
 	// Set SPA deployment, Service & ingress as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, deployment, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(instance, newDeploymentInstance, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	if err := controllerutil.SetControllerReference(instance, service, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(instance, newServiceInstance, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	if err := controllerutil.SetControllerReference(instance, ingress, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(instance, newIngressInstance, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	// Check if this Deployment already exists
 	foundDeployment := &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: deployment.Name, Namespace: deployment.Namespace}, foundDeployment)
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: newDeploymentInstance.Name, Namespace: newDeploymentInstance.Namespace}, foundDeployment)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Deployment", "Deployment.Namespace", deployment.Namespace, "deployment.Name", deployment.Name)
-		err = r.client.Create(context.TODO(), deployment)
+		reqLogger.Info("Creating a new Deployment", "Deployment.Namespace", newDeploymentInstance.Namespace, "deployment.Name", newDeploymentInstance.Name)
+		err = r.client.Create(context.TODO(), newDeploymentInstance)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
 	} else if err != nil {
 		return reconcile.Result{}, err
+	} else {
+
+		if !reflect.DeepEqual(newDeploymentInstance.Spec, foundDeployment.Spec) {
+			ctx := context.TODO()
+			err := r.client.Update(ctx, newDeploymentInstance)
+
+			if err != nil {
+				return reconcile.Result{}, err
+			} else {
+				reqLogger.Info("Updated a new Deployment", "Deployment.Namespace", newDeploymentInstance.Namespace, "deployment.Name", newDeploymentInstance.Name)
+			}
+		}
 	}
 
 	// Check if this Ingress already exists
 	foundIngress := &v1beta1.Ingress{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: ingress.Name, Namespace: ingress.Namespace}, foundIngress)
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: newIngressInstance.Name, Namespace: newIngressInstance.Namespace}, foundIngress)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Ingress", "Ingress.Namespace", ingress.Namespace, "Ingress.Name", ingress.Name)
-		err = r.client.Create(context.TODO(), ingress)
+		reqLogger.Info("Creating a new Ingress", "Ingress.Namespace", newIngressInstance.Namespace, "Ingress.Name", newIngressInstance.Name)
+		err = r.client.Create(context.TODO(), newIngressInstance)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -140,10 +165,10 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 
 	// Check if this Service already exists
 	foundService := &corev1.Service{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: service.Name, Namespace: service.Namespace}, foundService)
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: newServiceInstance.Name, Namespace: newServiceInstance.Namespace}, foundService)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new service", "Service.Namespace", service.Namespace, "Service.Name", service.Name)
-		err = r.client.Create(context.TODO(), service)
+		reqLogger.Info("Creating a new service", "Service.Namespace", newServiceInstance.Namespace, "Service.Name", newServiceInstance.Name)
+		err = r.client.Create(context.TODO(), newServiceInstance)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -154,8 +179,6 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 		return reconcile.Result{}, err
 	}
 
-	// Deployment already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Deployment already exists", "Deployment.Namespace", foundDeployment.Namespace, "Deployment.Name", foundDeployment.Name)
 	return reconcile.Result{}, nil
 }
 

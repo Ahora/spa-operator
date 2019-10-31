@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/example-inc/app-operator/pkg/apis/ahora/v1alpha1"
+	"github.com/ahora/spa-operator/pkg/apis/ahora/v1alpha1"
 )
 
 func init() {

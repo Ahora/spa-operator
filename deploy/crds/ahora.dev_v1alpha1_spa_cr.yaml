@@ -1,0 +1,7 @@
+apiVersion: ahora.dev/v1alpha1
+kind: SPA
+metadata:
+  name: example-spa
+spec:
+  # Add fields here
+  size: 3

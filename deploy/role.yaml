@@ -17,13 +17,13 @@ rules:
   - secrets
   verbs:
   - '*'
-- apiGroups:
+ - apiGroups:
     - extensions
     - "networking.k8s.io" # k8s 1.14+
   resources:
     - ingresses
   verbs:
-    - '*'
+    - '*' 
 - apiGroups:
   - apps
   resources:
@@ -58,6 +58,7 @@ rules:
   - apps
   resources:
   - replicasets
+  - deployments
   verbs:
   - get
 - apiGroups:

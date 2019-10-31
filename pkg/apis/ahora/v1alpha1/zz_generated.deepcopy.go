@@ -40,7 +40,7 @@ func (in *SPA) DeepCopyObject() runtime.Object {
 func (in *SPAList) DeepCopyInto(out *SPAList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]SPA, len(*in))

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/example-inc/app-operator/pkg/controller/spa"
+	"github.com/ahora/spa-operator/pkg/controller/spa"
 )
 
 func init() {

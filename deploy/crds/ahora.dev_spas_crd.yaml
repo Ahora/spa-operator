@@ -31,15 +31,6 @@ spec:
         spec:
           description: SPASpec defines the desired state of SPA
           type: object
-          properties:
-            SPAArchiveURL:
-              type: string
-            replicas:
-              type: integer
-            hosts:
-              type: array
-              items:
-                type: string
         status:
           description: SPAStatus defines the observed state of SPA
           type: object
