@@ -99,8 +99,16 @@ func (r *ReconcileSPA) Reconcile(request reconcile.Request) (reconcile.Result, e
 	service := newServiceForCR(instance)
 	ingress := newIngress(instance)
 
-	// Set SPA instance as the owner and controller
+	// Set SPA deployment, Service & ingress as the owner and controller
 	if err := controllerutil.SetControllerReference(instance, deployment, r.scheme); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	if err := controllerutil.SetControllerReference(instance, service, r.scheme); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	if err := controllerutil.SetControllerReference(instance, ingress, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
